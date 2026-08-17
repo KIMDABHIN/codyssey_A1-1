@@ -69,11 +69,25 @@ def add_prompt():
     while True:
         title = input("제목을 입력하세요: ").strip()
 
-        if title:
-            break
+        if not title:
+            print("제목은 비워둘 수 없습니다.")
+            print()
+            continue
 
-        print("제목은 비워둘 수 없습니다.")
-        print()
+        duplicate = False
+
+        for prompt in prompts:
+            if prompt["title"].lower() == title.lower():
+                duplicate = True
+                break
+
+        if duplicate:
+            print("이미 같은 제목의 프롬프트가 있습니다.")
+            print("다른 제목을 입력해주세요.")
+            print()
+            continue
+
+        break
 
     while True:
         content = input("내용을 입력하세요: ").strip()
@@ -114,7 +128,6 @@ def add_prompt():
     print()
     print("✅ 프롬프트가 추가되었습니다!")
     print()
-
 
 def show_list(prompt_list=None):
     print()
