@@ -214,7 +214,7 @@ def search_prompt():
     print("========================================")
     print()
 
-    keyword = input("검색할 키워드를 입력하세요: ")
+    keyword = get_input("검색할 키워드를 입력하세요: ")
 
     if not keyword:
         print("검색어를 입력해주세요.")
@@ -223,7 +223,11 @@ def search_prompt():
     result = []
 
     for prompt in prompts:
-        if keyword.lower() in prompt["title"].lower() or keyword.lower() in prompt["content"].lower():
+        title = prompt["title"].lower()
+        content = prompt["content"].lower()
+        category = prompt["category"].lower()
+
+        if keyword.lower() in title or keyword.lower() in content or keyword.lower() in category:
             result.append(prompt)
 
     print()
@@ -240,7 +244,6 @@ def search_prompt():
             print(f"{i}. {prompt['title']}{favorite_mark}")
             print(f"   카테고리: {prompt['category']}")
             print()
-
 
 def show_detail():
     print()
