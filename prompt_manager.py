@@ -55,17 +55,18 @@ def show_menu():
     print("1. 프롬프트 추가")
     print("2. 프롬프트 목록 보기")
     print("3. 프롬프트 삭제")
+    print("4. 프롬프트 수정")
     print()
 
     print("[ 프롬프트 조회 ]")
-    print("4. 카테고리별 조회")
-    print("5. 프롬프트 검색")
-    print("6. 프롬프트 상세 보기")
+    print("5. 카테고리별 조회")
+    print("6. 프롬프트 검색")
+    print("7. 프롬프트 상세 보기")
     print()
 
     print("[ 즐겨찾기 ]")
-    print("7. 즐겨찾기 추가/해제")
-    print("8. 즐겨찾기 목록 보기")
+    print("8. 즐겨찾기 추가/해제")
+    print("9. 즐겨찾기 목록 보기")
     print()
 
     print("----------------------------------------")
@@ -207,6 +208,50 @@ def delete_prompt():
 
         else:
             print("y 또는 n을 입력해주세요.")
+def edit_prompt():
+    print()
+    print("========================================")
+    print("             프롬프트 수정")
+    print("========================================")
+    print()
+
+    show_list()
+
+    if len(prompts) == 0:
+        return
+
+    while True:
+        choice = get_input("수정할 프롬프트 번호를 입력하세요: ")
+
+        if choice.isdigit():
+            number = int(choice)
+
+            if 1 <= number <= len(prompts):
+                prompt = prompts[number - 1]
+                break
+
+        print("올바른 프롬프트 번호를 입력해주세요.")
+
+    print()
+    print(f"현재 제목: {prompt['title']}")
+    new_title = get_input("새 제목을 입력하세요: ")
+
+    if not new_title:
+        new_title = prompt["title"]
+
+    print()
+    print(f"현재 내용: {prompt['content']}")
+    new_content = get_input("새 내용을 입력하세요: ")
+
+    if not new_content:
+        new_content = prompt["content"]
+
+    prompt["title"] = new_title
+    prompt["content"] = new_content
+
+    print()
+    print("✅ 프롬프트가 수정되었습니다!")
+    print()            
 
 def show_categories():
     print()
@@ -406,18 +451,21 @@ while True:
         delete_prompt()
 
     elif choice == "4":
-        show_categories()
+        edit_prompt()
 
     elif choice == "5":
-        search_prompt()
+        show_categories()
 
     elif choice == "6":
-        show_detail()
+        search_prompt()
 
     elif choice == "7":
-        toggle_favorite()
+        show_detail()
 
     elif choice == "8":
+        toggle_favorite()
+
+    elif choice == "9":
         show_favorites()
 
     elif choice == "0":
@@ -434,5 +482,5 @@ while True:
         print()
         print("----------------------------------------")
         print("⚠ 잘못된 메뉴 번호입니다.")
-        print("0~8 사이의 번호를 입력해주세요.")
+        print("0~9 사이의 번호를 입력해주세요.")
         print("----------------------------------------")
