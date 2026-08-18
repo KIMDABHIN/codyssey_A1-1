@@ -208,6 +208,7 @@ def delete_prompt():
 
         else:
             print("y 또는 n을 입력해주세요.")
+
 def edit_prompt():
     print()
     print("========================================")
@@ -234,10 +235,25 @@ def edit_prompt():
 
     print()
     print(f"현재 제목: {prompt['title']}")
-    new_title = get_input("새 제목을 입력하세요: ")
 
-    if not new_title:
-        new_title = prompt["title"]
+    while True:
+        new_title = get_input("새 제목을 입력하세요: ")
+
+        if not new_title:
+            new_title = prompt["title"]
+            break
+
+        duplicate = any(
+            other_prompt["title"].lower() == new_title.lower()
+            for i, other_prompt in enumerate(prompts)
+            if i != number - 1
+        )
+
+        if duplicate:
+            print("이미 같은 제목의 프롬프트가 있습니다.")
+            print("다른 제목을 입력해주세요.")
+        else:
+            break
 
     print()
     print(f"현재 내용: {prompt['content']}")
@@ -251,8 +267,7 @@ def edit_prompt():
 
     print()
     print("✅ 프롬프트가 수정되었습니다!")
-    print()            
-
+    print()
 def show_categories():
     print()
     print("========================================")
