@@ -29,20 +29,20 @@ categories = [
     "자동화",
     "기타"
 ]
+
+
+class CancelOperation(Exception):
+    pass
+
+
 def get_input(message):
     value = input(message).strip()
 
     if value.lower() == "q":
-        print()
-        print("========================================")
-        print("          프로그램 종료")
-        print("========================================")
-        print()
-        print("프로그램을 종료합니다.")
-        print()
-        exit()
+        raise CancelOperation()
 
     return value
+
 
 def show_menu():
     print()
@@ -75,73 +75,84 @@ def show_menu():
 
 
 def add_prompt():
-    print()
-    print("========================================")
-    print("             프롬프트 추가")
-    print("========================================")
-    print()
-
-    while True:
-        title = input("제목을 입력하세요: ")
-
-        if not title:
-            print("제목은 비워둘 수 없습니다.")
-            print()
-            continue
-
-        duplicate = False
-
-        for prompt in prompts:
-            if prompt["title"].lower() == title.lower():
-                duplicate = True
-                break
-
-        if duplicate:
-            print("이미 같은 제목의 프롬프트가 있습니다.")
-            print("다른 제목을 입력해주세요.")
-            print()
-            continue
-
-        break
-
-    while True:
-        content = input("내용을 입력하세요: ")
-        if content:
-            break
-
-        print("내용은 비워둘 수 없습니다.")
+    try:
+        print()
+        print("========================================")
+        print("             프롬프트 추가")
+        print("========================================")
         print()
 
-    print()
-    print("[ 카테고리 선택 ]")
+        while True:
+            title = get_input("제목을 입력하세요: ")
 
-    for i, category in enumerate(categories, start=1):
-        print(f"{i}. {category}")
+            if not title:
+                print("제목은 비워둘 수 없습니다.")
+                print()
+                continue
 
-    while True:
-        category_choice = input("카테고리 번호를 선택하세요: ")
+            duplicate = False
 
-        if category_choice.isdigit():
-            category_number = int(category_choice)
+            for prompt in prompts:
+                if prompt["title"].lower() == title.lower():
+                    duplicate = True
+                    break
 
-            if 1 <= category_number <= len(categories):
-                category = categories[category_number - 1]
+            if duplicate:
+                print("이미 같은 제목의 프롬프트가 있습니다.")
+                print("다른 제목을 입력해주세요.")
+                print()
+                continue
+
+            break
+
+        while True:
+            content = get_input("내용을 입력하세요: ")
+
+            if content:
                 break
 
-        print("올바른 카테고리 번호를 입력해주세요.")
+            print("내용은 비워둘 수 없습니다.")
+            print()
 
-    new_prompt = {
-        "title": title,
-        "content": content,
-        "category": category,
-        "favorite": False
-    }
+        print()
+        print("[ 카테고리 선택 ]")
 
-    prompts.append(new_prompt)
+        for i, category in enumerate(categories, start=1):
+            print(f"{i}. {category}")
 
-    print()
-    print("✅ 프롬프트가 추가되었습니다!")
-    print()
+        while True:
+            category_choice = get_input("카테고리 번호를 선택하세요: ")
+
+            if category_choice.isdigit():
+                category_number = int(category_choice)
+
+                if 1 <= category_number <= len(categories):
+                    category = categories[category_number - 1]
+                    break
+
+            print("올바른 카테고리 번호를 입력해주세요.")
+
+        new_prompt = {
+            "title": title,
+            "content": content,
+            "category": category,
+            "favorite": False
+        }
+
+        prompts.append(new_prompt)
+
+        print()
+        print("✅ 프롬프트가 추가되었습니다!")
+        print()
+
+    except CancelOperation:
+        print()
+        print("----------------------------------------")
+        print("작업이 취소되었습니다.")
+        print("메인 메뉴로 돌아갑니다.")
+        print("----------------------------------------")
+        print()
+
 
 def show_list(prompt_list=None):
     print()
@@ -163,290 +174,362 @@ def show_list(prompt_list=None):
         print(f"{i}. {prompt['title']}{favorite_mark}")
         print(f"   카테고리: {prompt['category']}")
         print()
+
+
 def delete_prompt():
-    print()
-    print("========================================")
-    print("             프롬프트 삭제")
-    print("========================================")
-    print()
-
-    show_list()
-
-    if len(prompts) == 0:
-        return
-
-    while True:
-        choice = get_input("삭제할 프롬프트 번호를 입력하세요: ")
-
-        if choice.isdigit():
-            number = int(choice)
-
-            if 1 <= number <= len(prompts):
-                prompt = prompts[number - 1]
-                break
-
-        print("올바른 프롬프트 번호를 입력해주세요.")
-
-    print()
-    print(f"선택한 프롬프트: {prompt['title']}")
-
-    while True:
-        confirm = get_input("정말 삭제하시겠습니까? (y/n): ").lower()
-
-        if confirm == "y":
-            prompts.remove(prompt)
-            print()
-            print("✅ 프롬프트가 삭제되었습니다.")
-            print()
-            break
-
-        elif confirm == "n":
-            print()
-            print("삭제가 취소되었습니다.")
-            print()
-            break
-
-        else:
-            print("y 또는 n을 입력해주세요.")
-
-def edit_prompt():
-    print()
-    print("========================================")
-    print("             프롬프트 수정")
-    print("========================================")
-    print()
-
-    show_list()
-
-    if len(prompts) == 0:
-        return
-
-    while True:
-        choice = get_input("수정할 프롬프트 번호를 입력하세요: ")
-
-        if choice.isdigit():
-            number = int(choice)
-
-            if 1 <= number <= len(prompts):
-                prompt = prompts[number - 1]
-                break
-
-        print("올바른 프롬프트 번호를 입력해주세요.")
-
-    print()
-    print(f"현재 제목: {prompt['title']}")
-
-    while True:
-        new_title = get_input("새 제목을 입력하세요: ")
-
-        if not new_title:
-            new_title = prompt["title"]
-            break
-
-        duplicate = any(
-            other_prompt["title"].lower() == new_title.lower()
-            for i, other_prompt in enumerate(prompts)
-            if i != number - 1
-        )
-
-        if duplicate:
-            print("이미 같은 제목의 프롬프트가 있습니다.")
-            print("다른 제목을 입력해주세요.")
-        else:
-            break
-
-    print()
-    print(f"현재 내용: {prompt['content']}")
-    new_content = get_input("새 내용을 입력하세요: ")
-
-    if not new_content:
-        new_content = prompt["content"]
-
-    prompt["title"] = new_title
-    prompt["content"] = new_content
-
-    print()
-    print("✅ 프롬프트가 수정되었습니다!")
-    print()
-def show_categories():
-    print()
-    print("========================================")
-    print("            카테고리별 조회")
-    print("========================================")
-    print()
-
-    for i, category in enumerate(categories, start=1):
-        print(f"{i}. {category}")
-
-    print()
-
-    while True:
-        choice = input("카테고리 번호를 선택하세요: ")
-
-        if choice.isdigit():
-            number = int(choice)
-
-            if 1 <= number <= len(categories):
-                selected_category = categories[number - 1]
-                break
-
-        print("올바른 번호를 입력해주세요.")
-
-    result = []
-
-    for prompt in prompts:
-        if prompt["category"] == selected_category:
-            result.append(prompt)
-
-    print()
-    print(f"[ {selected_category} ]")
-    print()
-
-    if len(result) == 0:
-        print("해당 카테고리의 프롬프트가 없습니다.")
-    else:
-        for i, prompt in enumerate(result, start=1):
-            favorite_mark = " ⭐" if prompt["favorite"] else ""
-
-            print(f"{i}. {prompt['title']}{favorite_mark}")
-            print()
-
-
-def search_prompt():
-    print()
-    print("========================================")
-    print("             프롬프트 검색")
-    print("========================================")
-    print()
-
-    keyword = get_input("검색할 키워드를 입력하세요: ")
-
-    if not keyword:
-        print("검색어를 입력해주세요.")
-        return
-
-    result = []
-
-    for prompt in prompts:
-        title = prompt["title"].lower()
-        content = prompt["content"].lower()
-        category = prompt["category"].lower()
-
-        if keyword.lower() in title or keyword.lower() in content or keyword.lower() in category:
-            result.append(prompt)
-
-    print()
-
-    if len(result) == 0:
-        print("검색 결과가 없습니다.")
-    else:
-        print(f"'{keyword}' 검색 결과")
+    try:
+        print()
+        print("========================================")
+        print("             프롬프트 삭제")
+        print("========================================")
         print()
 
-        for i, prompt in enumerate(result, start=1):
-            favorite_mark = " ⭐" if prompt["favorite"] else ""
+        show_list()
 
-            print(f"{i}. {prompt['title']}{favorite_mark}")
-            print(f"   카테고리: {prompt['category']}")
-            print()
+        if len(prompts) == 0:
+            return
 
-def show_detail():
-    print()
-    print("========================================")
-    print("           프롬프트 상세 보기")
-    print("========================================")
-    print()
+        while True:
+            choice = get_input("삭제할 프롬프트 번호를 입력하세요: ")
 
-    show_list()
+            if choice.isdigit():
+                number = int(choice)
 
-    if len(prompts) == 0:
-        return
+                if 1 <= number <= len(prompts):
+                    prompt = prompts[number - 1]
+                    break
 
-    while True:
-        print("번호를 입력할 준비가 되었습니다.")
+            print("올바른 프롬프트 번호를 입력해주세요.")
 
-        choice = input("상세히 볼 프롬프트 번호를 입력하세요: ")
+        print()
+        print(f"선택한 프롬프트: {prompt['title']}")
 
-        if choice.isdigit():
-            number = int(choice)
+        while True:
+            confirm = get_input("정말 삭제하시겠습니까? (y/n): ").lower()
 
-            if 1 <= number <= len(prompts):
-                prompt = prompts[number - 1]
-                break
+            if confirm == "y":
+                prompts.remove(prompt)
 
-        print("올바른 프롬프트 번호를 입력해주세요.")
-
-    print()
-    print("----------------------------------------")
-    print(f"제목: {prompt['title']}")
-    print(f"카테고리: {prompt['category']}")
-
-    if prompt["favorite"]:
-        print("즐겨찾기: ⭐")
-    else:
-        print("즐겨찾기: 없음")
-
-    print("----------------------------------------")
-    print("내용:")
-    print(prompt["content"])
-    print("----------------------------------------")
-
-
-def toggle_favorite():
-    print()
-    print("========================================")
-    print("         즐겨찾기 추가 / 해제")
-    print("========================================")
-    print()
-
-    show_list()
-
-    if len(prompts) == 0:
-        return
-
-    while True:
-        choice = input("즐겨찾기를 변경할 프롬프트 번호를 입력하세요: ")
-
-        if choice.isdigit():
-            number = int(choice)
-
-            if 1 <= number <= len(prompts):
-                prompt = prompts[number - 1]
-                prompt["favorite"] = not prompt["favorite"]
-
-                if prompt["favorite"]:
-                    print()
-                    print("⭐ 즐겨찾기에 추가되었습니다!")
-                else:
-                    print()
-                    print("즐겨찾기에서 해제되었습니다.")
-
+                print()
+                print("✅ 프롬프트가 삭제되었습니다.")
                 print()
                 break
 
-        print("올바른 프롬프트 번호를 입력해주세요.")
+            elif confirm == "n":
+                print()
+                print("삭제가 취소되었습니다.")
+                print()
+                break
+
+            else:
+                print("y 또는 n을 입력해주세요.")
+
+    except CancelOperation:
+        print()
+        print("----------------------------------------")
+        print("작업이 취소되었습니다.")
+        print("메인 메뉴로 돌아갑니다.")
+        print("----------------------------------------")
+        print()
+
+
+def edit_prompt():
+    try:
+        print()
+        print("========================================")
+        print("             프롬프트 수정")
+        print("========================================")
+        print()
+
+        show_list()
+
+        if len(prompts) == 0:
+            return
+
+        while True:
+            choice = get_input("수정할 프롬프트 번호를 입력하세요: ")
+
+            if choice.isdigit():
+                number = int(choice)
+
+                if 1 <= number <= len(prompts):
+                    prompt = prompts[number - 1]
+                    break
+
+            print("올바른 프롬프트 번호를 입력해주세요.")
+
+        print()
+        print(f"현재 제목: {prompt['title']}")
+
+        while True:
+            new_title = get_input("새 제목을 입력하세요: ")
+
+            if not new_title:
+                new_title = prompt["title"]
+                break
+
+            duplicate = any(
+                other_prompt["title"].lower() == new_title.lower()
+                for i, other_prompt in enumerate(prompts)
+                if i != number - 1
+            )
+
+            if duplicate:
+                print("이미 같은 제목의 프롬프트가 있습니다.")
+                print("다른 제목을 입력해주세요.")
+            else:
+                break
+
+        print()
+        print(f"현재 내용: {prompt['content']}")
+        new_content = get_input("새 내용을 입력하세요: ")
+
+        if not new_content:
+            new_content = prompt["content"]
+
+        prompt["title"] = new_title
+        prompt["content"] = new_content
+
+        print()
+        print("✅ 프롬프트가 수정되었습니다!")
+        print()
+
+    except CancelOperation:
+        print()
+        print("----------------------------------------")
+        print("작업이 취소되었습니다.")
+        print("메인 메뉴로 돌아갑니다.")
+        print("----------------------------------------")
+        print()
+
+
+def show_categories():
+    try:
+        print()
+        print("========================================")
+        print("            카테고리별 조회")
+        print("========================================")
+        print()
+
+        for i, category in enumerate(categories, start=1):
+            print(f"{i}. {category}")
+
+        print()
+
+        while True:
+            choice = get_input("카테고리 번호를 선택하세요: ")
+
+            if choice.isdigit():
+                number = int(choice)
+
+                if 1 <= number <= len(categories):
+                    selected_category = categories[number - 1]
+                    break
+
+            print("올바른 번호를 입력해주세요.")
+
+        result = []
+
+        for prompt in prompts:
+            if prompt["category"] == selected_category:
+                result.append(prompt)
+
+        print()
+        print(f"[ {selected_category} ]")
+        print()
+
+        if len(result) == 0:
+            print("해당 카테고리의 프롬프트가 없습니다.")
+        else:
+            for i, prompt in enumerate(result, start=1):
+                favorite_mark = " ⭐" if prompt["favorite"] else ""
+
+                print(f"{i}. {prompt['title']}{favorite_mark}")
+                print()
+
+    except CancelOperation:
+        print()
+        print("----------------------------------------")
+        print("작업이 취소되었습니다.")
+        print("메인 메뉴로 돌아갑니다.")
+        print("----------------------------------------")
+        print()
+
+
+def search_prompt():
+    try:
+        print()
+        print("========================================")
+        print("             프롬프트 검색")
+        print("========================================")
+        print()
+
+        keyword = get_input("검색할 키워드를 입력하세요: ")
+
+        if not keyword:
+            print("검색어를 입력해주세요.")
+            return
+
+        result = []
+
+        for prompt in prompts:
+            title = prompt["title"].lower()
+            content = prompt["content"].lower()
+            category = prompt["category"].lower()
+
+            if (
+                keyword.lower() in title
+                or keyword.lower() in content
+                or keyword.lower() in category
+            ):
+                result.append(prompt)
+
+        print()
+
+        if len(result) == 0:
+            print("검색 결과가 없습니다.")
+        else:
+            print(f"'{keyword}' 검색 결과")
+            print()
+
+            for i, prompt in enumerate(result, start=1):
+                favorite_mark = " ⭐" if prompt["favorite"] else ""
+
+                print(f"{i}. {prompt['title']}{favorite_mark}")
+                print(f"   카테고리: {prompt['category']}")
+                print()
+
+    except CancelOperation:
+        print()
+        print("----------------------------------------")
+        print("작업이 취소되었습니다.")
+        print("메인 메뉴로 돌아갑니다.")
+        print("----------------------------------------")
+        print()
+
+
+def show_detail():
+    try:
+        print()
+        print("========================================")
+        print("           프롬프트 상세 보기")
+        print("========================================")
+        print()
+
+        show_list()
+
+        if len(prompts) == 0:
+            return
+
+        while True:
+            choice = get_input("상세히 볼 프롬프트 번호를 입력하세요: ")
+
+            if choice.isdigit():
+                number = int(choice)
+
+                if 1 <= number <= len(prompts):
+                    prompt = prompts[number - 1]
+                    break
+
+            print("올바른 프롬프트 번호를 입력해주세요.")
+
+        print()
+        print("----------------------------------------")
+        print(f"제목: {prompt['title']}")
+        print(f"카테고리: {prompt['category']}")
+
+        if prompt["favorite"]:
+            print("즐겨찾기: ⭐")
+        else:
+            print("즐겨찾기: 없음")
+
+        print("----------------------------------------")
+        print("내용:")
+        print(prompt["content"])
+        print("----------------------------------------")
+
+    except CancelOperation:
+        print()
+        print("----------------------------------------")
+        print("작업이 취소되었습니다.")
+        print("메인 메뉴로 돌아갑니다.")
+        print("----------------------------------------")
+        print()
+
+
+def toggle_favorite():
+    try:
+        print()
+        print("========================================")
+        print("         즐겨찾기 추가 / 해제")
+        print("========================================")
+        print()
+
+        show_list()
+
+        if len(prompts) == 0:
+            return
+
+        while True:
+            choice = get_input("즐겨찾기를 변경할 프롬프트 번호를 입력하세요: ")
+
+            if choice.isdigit():
+                number = int(choice)
+
+                if 1 <= number <= len(prompts):
+                    prompt = prompts[number - 1]
+                    prompt["favorite"] = not prompt["favorite"]
+
+                    if prompt["favorite"]:
+                        print()
+                        print("⭐ 즐겨찾기에 추가되었습니다!")
+                    else:
+                        print()
+                        print("즐겨찾기에서 해제되었습니다.")
+
+                    print()
+                    break
+
+            print("올바른 프롬프트 번호를 입력해주세요.")
+
+    except CancelOperation:
+        print()
+        print("----------------------------------------")
+        print("작업이 취소되었습니다.")
+        print("메인 메뉴로 돌아갑니다.")
+        print("----------------------------------------")
+        print()
 
 
 def show_favorites():
-    print()
-    print("========================================")
-    print("            즐겨찾기 목록")
-    print("========================================")
-    print()
+    try:
+        print()
+        print("========================================")
+        print("            즐겨찾기 목록")
+        print("========================================")
+        print()
 
-    favorites = []
+        favorites = []
 
-    for prompt in prompts:
-        if prompt["favorite"]:
-            favorites.append(prompt)
+        for prompt in prompts:
+            if prompt["favorite"]:
+                favorites.append(prompt)
 
-    if len(favorites) == 0:
-        print("즐겨찾기한 프롬프트가 없습니다.")
-        return
+        if len(favorites) == 0:
+            print("즐겨찾기한 프롬프트가 없습니다.")
+            return
 
-    for i, prompt in enumerate(favorites, start=1):
-        print(f"{i}. {prompt['title']} ⭐")
-        print(f"   카테고리: {prompt['category']}")
+        for i, prompt in enumerate(favorites, start=1):
+            print(f"{i}. {prompt['title']} ⭐")
+            print(f"   카테고리: {prompt['category']}")
+            print()
+
+    except CancelOperation:
+        print()
+        print("----------------------------------------")
+        print("작업이 취소되었습니다.")
+        print("메인 메뉴로 돌아갑니다.")
+        print("----------------------------------------")
         print()
 
 
@@ -454,7 +537,7 @@ def show_favorites():
 while True:
     show_menu()
 
-    choice = get_input("메뉴 번호를 선택하세요: ")
+    choice = input("메뉴 번호를 선택하세요: ").strip()
 
     if choice == "1":
         add_prompt()
