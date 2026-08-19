@@ -169,10 +169,14 @@ def show_list(prompt_list=None):
         return
 
     for i, prompt in enumerate(prompt_list, start=1):
-        favorite_mark = " ⭐" if prompt["favorite"] else ""
+        if prompt["favorite"]:
+            favorite_status = "⭐ 즐겨찾기"
+        else:
+            favorite_status = "즐겨찾기 아님"
 
-        print(f"{i}. {prompt['title']}{favorite_mark}")
+        print(f"{i}. {prompt['title']}")
         print(f"   카테고리: {prompt['category']}")
+        print(f"   {favorite_status}")
         print()
 
 
