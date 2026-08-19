@@ -81,3 +81,7 @@ main 브랜치로 병합하여 Git의 브랜치 및 병합 기능을 활용했�
 - Visual Studio Code
 - Git
 - GitHub
+
+## Git 브랜치 병합 테스트
+
+Git 브랜치에서 변경사항을 작업한 후 main 브랜치에 병합했습니다.
